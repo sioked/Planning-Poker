@@ -1,6 +1,7 @@
 #Module Dependencies
 express = require 'express'
 app = module.exports = express.createServer()
+app.use require('connect-assets')()
 
 #Configuration
 app.set 'views', (__dirname + '/views')
@@ -21,4 +22,4 @@ app.get '/', (req, res) ->
   res.render('index', {title: 'Hello World' })
 
 app.listen 3000
-console.log "Server listening on pord %d in %s mode", app.address().port, app.settings.env
+console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env
