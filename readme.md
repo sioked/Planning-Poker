@@ -8,6 +8,8 @@ planning tasks to include in a forthcoming sprint.
 * [Node.js](http://nodejs.org)
 * [Express](http://expressjs.com/)
 * [Jade Templating](http://jade-lang.com/)
+* [Stylus
+  Stylesheets](http://learnboost.github.com/stylus/docs/middleware.html)
 
 ##Setup & Run Project
 
