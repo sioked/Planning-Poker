@@ -1,4 +1,4 @@
-socket = io.connect
+socket = io.connect()
 socket.on 'connect', ->
   socket.emit 'set name', 'Ed'
   console.log "connected"
