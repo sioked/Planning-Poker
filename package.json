@@ -8,6 +8,7 @@
       "coffee-script": ">=1.1.2",
       "stylus": "latest",
       "nib": "latest",
-      "connect-assets": "latest"
+      "connect-assets": "latest",
+      "socket.io": "latest"
   }
 }

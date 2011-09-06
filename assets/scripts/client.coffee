@@ -1,28 +1,18 @@
-# Assignment:
-number   = 42
-opposite = true
+socket = io.connect "http://localhost"
 
-# Conditions:
-number = -42 if opposite
+socket.on 'connect', ->
+  socket.emit 'set name', 'Ed'
+  console.log "connected"
 
-# Functions:
-square = (x) -> x * x
+socket.on 'alert', (alert) ->
+  console.log "Alert received #{alert}"
 
-# Arrays:
-list = [1, 2, 3, 4, 5]
+socket.on "message", (msg) ->
+  console.log "Got a message #{msg.message} from user #{msg.name}"
 
-# Objects:
-math =
-  root:   Math.sqrt
-  square: square
-  cube:   (x) -> x * square x
-
-# Splats:
-race = (winner, runners...) ->
-  print winner, runners
-
-# Existence:
-alert "I knew it!" if elvis?
-
-# Array comprehensions:
-cubes = (math.cube num for num in list)
+socket.on 'disconnect', ->
+  console.log "disconnected"
+  
+window.sendMessage = (message) ->
+  console.log "sending message #{message}"
+  socket.emit 'message', message

@@ -10,6 +10,7 @@ planning tasks to include in a forthcoming sprint.
 * [Jade Templating](http://jade-lang.com/)
 * [Stylus
   Stylesheets](http://learnboost.github.com/stylus/docs/middleware.html)
+* [Socket.io](http://socket.io)
 
 ##Setup & Run Project
 

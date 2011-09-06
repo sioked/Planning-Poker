@@ -1,6 +1,7 @@
 #Module Dependencies
 express = require 'express'
 app = module.exports = express.createServer()
+io = require('socket.io').listen app
 app.use require('connect-assets')()
 
 #Configuration
@@ -20,6 +21,19 @@ app.configure 'production', ->
 #Routes to respond to
 app.get '/', (req, res) ->
   res.render('index', {title: 'Hello World' })
-
+  
+io.sockets.on 'connection', (socket) ->
+  socket.on 'set name', (name) ->
+    console.log "got a name request for #{name}"
+    socket.set 'name', name, ->
+      console.log "sending message back to #{name}"
+      socket.emit "alert", "#{name} is ready for action"
+      socket.broadcast.emit "alert", "Welcome #{name}"
+  
+  socket.on 'message', (msg) ->
+      socket.get 'name', (err, name) ->
+        if !err
+          socket.broadcast.emit "message", { name: "#{name}", message: "#{msg}"}
+  
 app.listen 3000
 console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env
