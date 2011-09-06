@@ -1,12 +1,27 @@
+@import 'external/reset'
+@import 'external/960/grid'
 @import 'nib'
 
+var_grid_columns = 12
+var_grid_gutter = 20px
+var_grid_width = 960px
+var_grid_debug = false
+var_font_size = (14px/1.4)
+
 body
-  font 12px/1.4 "Lucida Grande", Arial, sans-serif
+  font 14px/1.4 "Lucida Grande", Arial, sans-serif
   background white
+  
+h1
+  font-size 2em
+  
+h2
+  font-size 1.6em
+
+h3
+  font-size 1.2em
 
 .container
   text-align center
 
-clearfix()
-global-reset()
-  
+@import 'mobile'

@@ -1,0 +1,33 @@
+//iPhone (portrait) media query
+@media only screen and (max-width: 767px)
+  body
+    min-width: 320px
+    
+  .container_12
+  .container_16
+  .container_24
+    width : 320px
+  
+  for cols in 12 16 24
+    for cell in 1 .. 24
+      if cell <= cols
+        .container_{cols}
+          .grid_{cell}
+            width 300px
+  
+//iPhone (landscape)
+@media only screen and (min-width: 480px) and (max-width: 767px)
+  body
+    min-width: 480px
+  
+  .container_12
+  .container_16
+  .container_24
+    width : 480px
+  
+  for cols in 12 16 24
+    for cell in 1 .. 24
+      if cell <= cols
+        .container_{cols}
+          .grid_{cell}
+            width 460px
