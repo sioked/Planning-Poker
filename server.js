@@ -1,17 +1,9 @@
 (function() {
-  var app, express, nib, stylus, stylusCompiler;
+  var app, express, io;
   express = require('express');
   app = module.exports = express.createServer();
-  stylus = require('stylus');
-  nib = require('nib');
-  stylusCompiler = function(string, path) {
-    return stylus(string).set('filename', path).use(nib());
-  };
-  app.use(stylus.middleware({
-    debug: true,
-    src: "" + __dirname + "/assets",
-    compiler: stylusCompiler
-  }));
+  io = require('socket.io').listen(app);
+  app.use(require('connect-assets')());
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
@@ -32,6 +24,26 @@
       title: 'Hello World'
     });
   });
-  app.listen(3000);
+  io.sockets.on('connection', function(socket) {
+    socket.on('set name', function(name) {
+      console.log("got a name request for " + name);
+      return socket.set('name', name, function() {
+        console.log("sending message back to " + name);
+        socket.emit("alert", "" + name + " is ready for action");
+        return socket.broadcast.emit("alert", "Welcome " + name);
+      });
+    });
+    return socket.on('message', function(msg) {
+      return socket.get('name', function(err, name) {
+        if (!err) {
+          return socket.broadcast.emit("message", {
+            name: "" + name,
+            message: "" + msg
+          });
+        }
+      });
+    });
+  });
+  app.listen(process.env.PORT || 3000);
   console.log("Server listening on port %d in %s mode", app.address().port, app.settings.env);
 }).call(this);
