@@ -21,9 +21,11 @@ h2
 h3
   font-size 1.2em
   
-var_card_width = 100px
+var_card_width = 80px
 var_card_height = var_card_width * 1.5
+
 .card
+  bold-button(#444)
   width var_card_width
   height var_card_height
   text-align center
@@ -32,8 +34,7 @@ var_card_height = var_card_width * 1.5
   line-height var_card_height
   margin-right 1em
   margin-top 1em
-  
-  &:hover
-    background-color gray
-
+  font-size 3em
+  text-decoration none
+    
 @import 'mobile'
