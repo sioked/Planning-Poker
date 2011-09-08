@@ -33,8 +33,8 @@ io.sockets.on 'connection', (socket) ->
 	  console.log "registering #{name}"
 	  socket.set 'name', name, ->
       	console.log "sending message back to #{name}"
-      	socket.emit "alert", "#{name} is ready for action"
-      	socket.broadcast.emit "alert", "Welcome #{name}"
+      	#socket.emit "register", "#{name}"
+      	socket.broadcast.emit "register", "#{name}"
   
 app.listen process.env.PORT || 3000
 console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env

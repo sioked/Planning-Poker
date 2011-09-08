@@ -8,6 +8,9 @@ socket.on 'alert', (alert) ->
 socket.on "message", (msg) ->
   console.log "Got a message #{msg.message} from user #{msg.name}"
 
+socket.on "register", (msg) ->
+  $('.people').append("<div class='name'>#{msg}</div>")
+
 socket.on 'disconnect', ->
   console.log "disconnected"
 	
