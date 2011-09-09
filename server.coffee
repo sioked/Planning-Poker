@@ -5,7 +5,6 @@ io = require('socket.io').listen app
 app.use require('connect-assets')()
 jade = require "jade"
 fs = require "fs"
-jadebrowser = require "jade-browser"
 
 #Configuration
 app.set 'views', (__dirname + '/views')
@@ -14,7 +13,16 @@ app.use express.bodyParser()
 app.use express.methodOverride()
 app.use app.router
 app.use express.static(__dirname + '/public')
-app.use jadebrowser('/scripts/templates.js', __dirname + '/views', {namespace: "jade", minify: true})
+
+dir = "#{__dirname}/views"
+templates = "window.tpl = {};"
+fs.readdir dir, (err, files) ->
+  files.forEach (file) ->
+    filename = "#{dir}/#{file}"
+    nm = /(.*)\.jade$/.exec(file)[1]
+    tpl = fs.readFileSync filename
+    fn = jade.compile tpl, {client: true, debug: true, compileDebug: false, filename:filename}
+    templates += "tpl.#{nm} = #{fn};"
 
 app.configure 'development', ->
   app.use express.errorHandler {dumpExceptions: true, showStack: true}
@@ -25,6 +33,10 @@ app.configure 'production', ->
 #Routes to respond to
 app.get '/', (req, res) ->
   res.render('index', {title: 'Hello World' })
+
+app.get '/scripts/templates.js', (req, res) ->
+  res.header "Content-Type", "application/javascript"
+  res.send templates
   
 app.get '/template/:file.js', (req, res) ->
   file = "#{__dirname}/views/#{req.params.file}.jade"
