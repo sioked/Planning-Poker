@@ -20,3 +20,14 @@ window.sendMessage = (message) ->
 
 window.register = (message) ->
   socket.emit 'register', message
+  
+  
+#Sammy.js configuration stuff - it's like a dispatcher/router thingamabobber
+app = $.sammy "#main", () ->
+  @get "#!/", (context) ->
+    console.log "Got main site with context #{context}"
+  @get "#!/login", (context) ->
+    console.log "Login screen"
+    context.app.swap ""
+$ ->
+  app.run "#!/"
