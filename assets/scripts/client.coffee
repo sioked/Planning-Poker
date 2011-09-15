@@ -8,8 +8,8 @@ socket.on 'alert', (alert) ->
 socket.on "message", (msg) ->
   console.log "Got a message #{msg.message} from user #{msg.name}"
 
-socket.on "register", (msg) ->
-  $('.people').append("<div class='name'>#{msg}</div>")
+socket.on "register", (name) ->
+  $('.people').append tpl.name({name: name, checked: false})
 
 socket.on 'disconnect', ->
   console.log "disconnected"
@@ -28,6 +28,6 @@ app = $.sammy "#main", () ->
     console.log "Got main site with context #{context}"
   @get "#!/login", (context) ->
     console.log "Login screen"
-    context.app.swap ""
+    context.app.swap tpl.login()
 $ ->
   app.run "#!/"

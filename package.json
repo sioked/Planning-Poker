@@ -9,6 +9,7 @@
       "stylus": "latest",
       "nib": "latest",
       "connect-assets": "latest",
-      "socket.io": "latest"
+      "socket.io": "latest",
+      "jade-client-connect": "latest"
   }
 }
