@@ -26,8 +26,19 @@ window.register = (message) ->
 app = $.sammy "#main", () ->
   @get "#!/", (context) ->
     console.log "Got main site with context #{context}"
+    name = $.cookie("name")
+    if not name
+      app.setLocation "#!/login"
+    else
+      register(name)
+      context.app.swap tpl.cards()
   @get "#!/login", (context) ->
     console.log "Login screen"
     context.app.swap tpl.login()
+    $("#login").bind "submit", (event) ->
+      nm = $("#login input").val()
+      $.cookie("name", nm)
+      app.setLocation "#!/"
+      false
 $ ->
   app.run "#!/"

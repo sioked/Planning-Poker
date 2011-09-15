@@ -25,18 +25,19 @@ app.get '/', (req, res) ->
   
 io.sockets.on 'connection', (socket) ->
   socket.on 'message', (msg) ->
-      socket.get 'name', (err, name) ->
-        if !err
-          socket.broadcast.emit "message", { name: "#{name}", message: "#{msg}"}
-        else
-          socket.emit "alert", "You are not registered."
+    socket.get 'name', (err, name) ->
+      if !err
+        socket.broadcast.emit "message", { name: "#{name}", message: "#{msg}"}
+      else
+        socket.emit "alert", "You are not registered."
   socket.on 'register', (name) ->
 	  console.log "registering #{name}"
 	  socket.set 'name', name, ->
-      	console.log "sending message back to #{name}"
-      	socket.emit "alert", "#{name} is ready for action"
-      	socket.broadcast.emit "alert", "Welcome #{name}"
-      	socket.broadcast.emit "register", name
+      console.log "sending message back to #{name}"
+      socket.emit "alert", "#{name} is ready for action"
+      socket.broadcast.emit "alert", "Welcome #{name}"
+      socket.broadcast.emit "register", name
+      socket.emit "register", name
   
 app.listen process.env.PORT || 3000
 console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env
