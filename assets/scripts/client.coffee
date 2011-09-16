@@ -24,7 +24,7 @@ window.register = (message) ->
   
 #Sammy.js configuration stuff - it's like a dispatcher/router thingamabobber
 app = $.sammy "#main", () ->
-  @get "#!/", (context) ->
+  @get "#!/", (context) =>
     console.log "Got main site with context #{context}"
     name = $.cookie("name")
     if not name
@@ -32,7 +32,7 @@ app = $.sammy "#main", () ->
     else
       register(name)
       context.app.swap tpl.cards()
-  @get "#!/login", (context) ->
+  @get "#!/login", (context) =>
     console.log "Login screen"
     context.app.swap tpl.login()
     $("#login").bind "submit", (event) ->
