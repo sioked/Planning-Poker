@@ -21,7 +21,7 @@ app.configure 'production', ->
 
 #Routes to respond to
 app.get '/', (req, res) ->
-  res.render('index', {title: 'Hello World' })
+  res.render('index', {title: 'Planning Poker' })
   
 io.sockets.on 'connection', (socket) ->
   socket.on 'message', (msg) ->
