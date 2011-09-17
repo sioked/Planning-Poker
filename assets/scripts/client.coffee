@@ -11,6 +11,9 @@ socket.on "message", (msg) ->
 socket.on "register", (name) ->
   $('.people').append tpl.name({name: name, checked: false})
 
+socket.on "vote", (name) ->
+  $('.people.name:contains("'+name+'")').append tpl.name({name: name, checked: true})
+
 socket.on 'disconnect', ->
   console.log "disconnected"
 	
@@ -20,7 +23,9 @@ window.sendMessage = (message) ->
 
 window.register = (message) ->
   socket.emit 'register', message
-  
+
+window.vote = (message) ->
+  socket.emit 'vote', message
   
 #Sammy.js configuration stuff - it's like a dispatcher/router thingamabobber
 app = $.sammy "#main", () ->

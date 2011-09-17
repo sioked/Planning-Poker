@@ -38,6 +38,13 @@ io.sockets.on 'connection', (socket) ->
       socket.broadcast.emit "alert", "Welcome #{name}"
       socket.broadcast.emit "register", name
       socket.emit "register", name
-  
+  socket.on 'vote', (vote) ->
+    console.log "voting #{vote}"
+    socket.get 'name', (err, name) ->
+      if !err
+        socket.broadcast.emit "vote", { name: "#{name}", vote: "#{vote}"}
+        socket.emit "vote", { name: "#{name}", vote: "#{vote}"}
+      else
+        socket.emit "alert", "You are not registered"
 app.listen process.env.PORT || 3000
 console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env
