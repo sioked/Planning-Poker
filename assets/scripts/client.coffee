@@ -11,8 +11,9 @@ socket.on "message", (msg) ->
 socket.on "register", (name) ->
   $('.people').append tpl.name({name: name, checked: false})
 
-socket.on "vote", (name) ->
-  $('.people.name:contains("'+name+'")').append tpl.name({name: name, checked: true})
+socket.on "vote", (vote) ->
+  node=$('.name:contains("'+vote.name+'")', $('.name', $('.people'))).parent()
+  $('.icon', node).addClass('check')
 
 socket.on 'disconnect', ->
   console.log "disconnected"
