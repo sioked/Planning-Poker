@@ -9,7 +9,6 @@ socket.on "message", (msg) ->
   console.log "Got a message #{msg.message} from user #{msg.name}"
 
 socket.on "register", (user) ->
-  console.log 'register: ' + user
   $('.people').append tpl.name({name: user.name, checked: false, id: user.id, vote: user.vote})
 
 socket.on "vote", (user) ->
@@ -18,13 +17,11 @@ socket.on "vote", (user) ->
     $('.vote', $('.name-'+user.id)).text(": " + user.vote)
     
 socket.on "reset", (users) ->
-  console.log "reset"
   for user in users 
     $('.vote', $('.name-'+user.id)).text("") 
     $('.icon', $('.name-'+user.id)).removeClass('check')
   
 socket.on "allUsers", (users) ->
-  console.log 'allUsers: ' + users
   for user in users 
     $('.people').append tpl.name({name: user.name, checked: user.vote == true, id: user.id, vote: user.vote})
 
@@ -32,7 +29,6 @@ socket.on 'disconnect', ->
   console.log "disconnected"
 	
 window.sendMessage = (message) ->
-  console.log "sending message #{message}"
   socket.emit 'message', message
 
 window.register = (message) ->
