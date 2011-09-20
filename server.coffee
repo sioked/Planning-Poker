@@ -23,6 +23,17 @@ app.configure 'production', ->
 app.get '/', (req, res) ->
   res.render('index', {title: 'Planning Poker' })
   
+#Collection of users
+users =[]
+#list of ids
+ids = [1000..1]
+
+findUser = (id) ->
+  for user in users
+    if(user.id == id) 
+      return user
+  return null
+  
 io.sockets.on 'connection', (socket) ->
   socket.on 'message', (msg) ->
     socket.get 'name', (err, name) ->
@@ -30,21 +41,32 @@ io.sockets.on 'connection', (socket) ->
         socket.broadcast.emit "message", { name: "#{name}", message: "#{msg}"}
       else
         socket.emit "alert", "You are not registered."
+        
   socket.on 'register', (name) ->
-	  console.log "registering #{name}"
-	  socket.set 'name', name, ->
-      console.log "sending message back to #{name}"
-      socket.emit "alert", "#{name} is ready for action"
-      socket.broadcast.emit "alert", "Welcome #{name}"
-      socket.broadcast.emit "register", name
-      socket.emit "register", name
+    console.log "registering #{name}"
+    id=ids.pop()
+    socket.set 'id', id, ->
+      user = {id: id, name: name, vote: 0}
+      socket.broadcast.emit "register", user
+      users.push user
+      console.log "emitting users"
+      socket.emit "allUsers", users
+      socket.broadcast.emit "register", user
+      
   socket.on 'vote', (vote) ->
     console.log "voting #{vote}"
-    socket.get 'name', (err, name) ->
+    socket.get 'id', (err, id) ->
       if !err
-        socket.broadcast.emit "vote", { name: "#{name}", vote: "#{vote}"}
-        socket.emit "vote", { name: "#{name}", vote: "#{vote}"}
+        console.log "inside if"
+        #user is coming back as null
+        user = findUser(id)
+        if user
+          console.log user
+          user.vote = vote
+          socket.broadcast.emit "vote", user
+          socket.emit "vote", user
       else
         socket.emit "alert", "You are not registered"
+        
 app.listen process.env.PORT || 3000
 console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env

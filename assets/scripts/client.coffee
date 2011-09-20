@@ -8,12 +8,20 @@ socket.on 'alert', (alert) ->
 socket.on "message", (msg) ->
   console.log "Got a message #{msg.message} from user #{msg.name}"
 
-socket.on "register", (name) ->
-  $('.people').append tpl.name({name: name, checked: false})
+socket.on "register", (user) ->
+  console.log 'register: ' + user
+  $('.people').append tpl.name({name: user.name, checked: false, id: user.id})
 
-socket.on "vote", (vote) ->
-  node=$('.name:contains("'+vote.name+'")', $('.name', $('.people'))).parent()
-  $('.icon', node).addClass('check')
+socket.on "vote", (user) ->
+  $('.icon', $('.name-'+user.id)).addClass('check')
+  #node=$('.name:contains("'+vote.name+'")', $('.name', $('.people'))).parent()
+  #$('.icon', node).addClass('check')
+
+socket.on "allUsers", (users) ->
+  console.log users
+  for user in users 
+    console.log user
+    $('.people').append tpl.name({name: user.name, checked: user.vote == true, id: user.id})
 
 socket.on 'disconnect', ->
   console.log "disconnected"
