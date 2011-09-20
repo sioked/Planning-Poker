@@ -63,5 +63,11 @@ io.sockets.on 'connection', (socket) ->
       else
         socket.emit "alert", "You are not registered"
         
+  socket.on 'reset', (reset) ->
+    console.log 'reseting'
+    user.vote = 0 for user in users
+    socket.broadcast.emit "reset", users
+    socket.emit "reset", users
+    
 app.listen process.env.PORT || 3000
 console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env

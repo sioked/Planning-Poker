@@ -16,6 +16,12 @@ socket.on "vote", (user) ->
   $('.icon', $('.name-'+user.id)).addClass('check')
   if(user.vote>0)
     $('.vote', $('.name-'+user.id)).text(": " + user.vote)
+    
+socket.on "reset", (users) ->
+  console.log "reset"
+  for user in users 
+    $('.vote', $('.name-'+user.id)).text("") 
+    $('.icon', $('.name-'+user.id)).removeClass('check')
   
 socket.on "allUsers", (users) ->
   console.log 'allUsers: ' + users
@@ -34,6 +40,9 @@ window.register = (message) ->
 
 window.vote = (message) ->
   socket.emit 'vote', message
+
+window.reset = () ->
+  socket.emit 'reset'
   
 #Sammy.js configuration stuff - it's like a dispatcher/router thingamabobber
 app = $.sammy "#main", () ->
