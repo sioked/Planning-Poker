@@ -43,7 +43,6 @@ io.sockets.on 'connection', (socket) ->
         socket.emit "alert", "You are not registered."
         
   socket.on 'register', (name) ->
-    console.log "registering #{name}"
     id=ids.pop()
     socket.set 'id', id, ->
       user = {id: id, name: name, vote: 0}
@@ -52,7 +51,6 @@ io.sockets.on 'connection', (socket) ->
       socket.broadcast.emit "register", user
       
   socket.on 'vote', (vote) ->
-    console.log "voting #{vote}"
     socket.get 'id', (err, id) ->
       if !err
         user = findUser(id)
@@ -64,7 +62,6 @@ io.sockets.on 'connection', (socket) ->
         socket.emit "alert", "You are not registered"
         
   socket.on 'reset', (reset) ->
-    console.log 'reseting'
     user.vote = 0 for user in users
     socket.broadcast.emit "reset", users
     socket.emit "reset", users
