@@ -48,7 +48,6 @@ io.sockets.on 'connection', (socket) ->
     socket.set 'id', id, ->
       user = {id: id, name: name, vote: 0}
       users.push user
-      console.log "emitting users"
       socket.emit "allUsers", users
       socket.broadcast.emit "register", user
       
@@ -56,11 +55,8 @@ io.sockets.on 'connection', (socket) ->
     console.log "voting #{vote}"
     socket.get 'id', (err, id) ->
       if !err
-        console.log "inside if"
-        #user is coming back as null
         user = findUser(id)
         if user
-          console.log user
           user.vote = vote
           socket.broadcast.emit "vote", user
           socket.emit "vote", user
