@@ -10,15 +10,17 @@ socket.on "message", (msg) ->
 
 socket.on "register", (user) ->
   console.log 'register: ' + user
-  $('.people').append tpl.name({name: user.name, checked: false, id: user.id})
+  $('.people').append tpl.name({name: user.name, checked: false, id: user.id, vote: user.vote})
 
 socket.on "vote", (user) ->
   $('.icon', $('.name-'+user.id)).addClass('check')
-
+  if(user.vote>0)
+    $('.vote', $('.name-'+user.id)).text(": " + user.vote)
+  
 socket.on "allUsers", (users) ->
   console.log 'allUsers: ' + users
   for user in users 
-    $('.people').append tpl.name({name: user.name, checked: user.vote == true, id: user.id})
+    $('.people').append tpl.name({name: user.name, checked: user.vote == true, id: user.id, vote: user.vote})
 
 socket.on 'disconnect', ->
   console.log "disconnected"
