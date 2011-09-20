@@ -16,9 +16,8 @@ socket.on "vote", (user) ->
   $('.icon', $('.name-'+user.id)).addClass('check')
 
 socket.on "allUsers", (users) ->
-  console.log users
+  console.log 'allUsers: ' + users
   for user in users 
-    console.log user
     $('.people').append tpl.name({name: user.name, checked: user.vote == true, id: user.id})
 
 socket.on 'disconnect', ->

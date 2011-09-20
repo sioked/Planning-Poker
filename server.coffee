@@ -47,7 +47,6 @@ io.sockets.on 'connection', (socket) ->
     id=ids.pop()
     socket.set 'id', id, ->
       user = {id: id, name: name, vote: 0}
-      socket.broadcast.emit "register", user
       users.push user
       console.log "emitting users"
       socket.emit "allUsers", users
