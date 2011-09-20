@@ -14,8 +14,6 @@ socket.on "register", (user) ->
 
 socket.on "vote", (user) ->
   $('.icon', $('.name-'+user.id)).addClass('check')
-  #node=$('.name:contains("'+vote.name+'")', $('.name', $('.people'))).parent()
-  #$('.icon', node).addClass('check')
 
 socket.on "allUsers", (users) ->
   console.log users
