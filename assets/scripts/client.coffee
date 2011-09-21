@@ -25,6 +25,9 @@ socket.on "allUsers", (users) ->
   for user in users 
     $('.people').append tpl.name({name: user.name, checked: user.vote == true, id: user.id, vote: user.vote})
 
+socket.on "results", (results) ->
+  console.log "results: " + results
+  
 socket.on 'disconnect', ->
   console.log "disconnected"
 	

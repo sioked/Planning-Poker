@@ -34,6 +34,19 @@ findUser = (id) ->
       return user
   return null
   
+areUsersFinished = () ->
+  for user in users
+    if user.vote <= 0
+      return false
+  return true
+
+calculateResults = () ->
+  results = []
+  for user in users
+    if user.vote > 0
+      results.push user.vote
+  return results
+  
 io.sockets.on 'connection', (socket) ->
   socket.on 'message', (msg) ->
     socket.get 'name', (err, name) ->
@@ -58,6 +71,10 @@ io.sockets.on 'connection', (socket) ->
           user.vote = vote
           socket.broadcast.emit "vote", user
           socket.emit "vote", user
+          if areUsersFinished()
+            results = calculateResults()
+            socket.emit "results", results
+            socket.broadcast.emit "results", results
       else
         socket.emit "alert", "You are not registered"
         
