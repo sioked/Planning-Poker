@@ -41,11 +41,14 @@ areUsersFinished = () ->
   return true
 
 calculateResults = () ->
-  results = []
-  for user in users
-    if user.vote > 0
-      results.push user.vote
-  return results
+  votes = []
+  for user in users when user.vote >0 
+    vote = (v for v in votes when user.vote == v.vote)
+    if(vote.length > 0)
+      vote[0].count+=1
+    else
+      votes.push {vote: user.vote, count: 1}
+  return votes  
   
 io.sockets.on 'connection', (socket) ->
   socket.on 'message', (msg) ->

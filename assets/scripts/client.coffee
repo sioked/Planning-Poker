@@ -13,21 +13,22 @@ socket.on "register", (user) ->
 
 socket.on "vote", (user) ->
   $('.icon', $('.name-'+user.id)).addClass('check')
-  if(user.vote>0)
-    $('.vote', $('.name-'+user.id)).text(": " + user.vote)
     
 socket.on "reset", (users) ->
   for user in users 
-    $('.vote', $('.name-'+user.id)).text("") 
     $('.icon', $('.name-'+user.id)).removeClass('check')
+  # need to remove the votes here.
+  console.log "results: " + $('.results.result')
+  $('.results.result').remove()
   
 socket.on "allUsers", (users) ->
   for user in users 
     $('.people').append tpl.name({name: user.name, checked: user.vote == true, id: user.id, vote: user.vote})
 
 socket.on "results", (results) ->
-  console.log "results: " + results
-  
+  for result in results
+    $('.results').append tpl.result({vote: result.vote, count: result.count})
+      
 socket.on 'disconnect', ->
   console.log "disconnected"
 	
