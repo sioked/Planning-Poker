@@ -13,6 +13,9 @@ app.use require('connect-assets')()
 app.use require('jade-client-connect')("#{__dirname}/views")
 app.use express.static(__dirname + '/public')
 
+#Collection of users
+users =[]
+
 app.configure 'development', ->
   app.use express.errorHandler {dumpExceptions: true, showStack: true}
 
@@ -23,8 +26,10 @@ app.configure 'production', ->
 app.get '/', (req, res) ->
   res.render('index', {title: 'Planning Poker' })
   
-#Collection of users
-users =[]
+app.get '/results', (req, res) ->
+  res.contentType 'application/json'
+  res.send JSON.stringify(users)
+
 #list of ids
 ids = [1000..1]
 
@@ -64,6 +69,7 @@ io.sockets.on 'connection', (socket) ->
       user = {id: id, name: name, vote: 0}
       users.push user
       socket.emit "allUsers", users
+      socket.emit "registered", id
       socket.broadcast.emit "register", user
       
   socket.on 'vote', (vote) ->
