@@ -28,7 +28,7 @@ app.get '/', (req, res) ->
   
 app.get '/results', (req, res) ->
   res.contentType 'application/json'
-  res.send JSON.stringify(users)
+  res.send JSON.stringify(calculateResults())
 
 #list of ids
 ids = [1000..1]
@@ -51,8 +51,9 @@ calculateResults = () ->
     vote = (v for v in votes when user.vote == v.vote)
     if(vote.length > 0)
       vote[0].count+=1
+      vote[0].users.push user
     else
-      votes.push {vote: user.vote, count: 1}
+      votes.push {vote: user.vote, count: 1, users: [user]}
   return votes  
   
 io.sockets.on 'connection', (socket) ->
