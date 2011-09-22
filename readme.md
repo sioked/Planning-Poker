@@ -20,3 +20,7 @@ planning tasks to include in a forthcoming sprint.
 npm install -g coffee-script
 npm install -d
 coffee server.coffee
+```
+
+##License
+This project is licensed under the MIT license. Please see the license for more details.
