@@ -93,5 +93,11 @@ io.sockets.on 'connection', (socket) ->
     socket.broadcast.emit "reset", users
     socket.emit "reset", users
     
+  socket.on 'disconnect', -> 
+    socket.get 'id', (err,id) ->
+      removals = (user for user in users when user.id == id)
+      users = (user for user in users when user.id != id)
+      socket.broadcast.emit "remove", removals
+    
 app.listen process.env.PORT || 3000
 console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env

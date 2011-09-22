@@ -51,6 +51,9 @@ socket.on "register", (user) ->
 
 socket.on "vote", (user) ->
   $('.icon', $('.name-'+user.id)).addClass('check')
+  
+socket.on "remove", (users) ->
+  $('.name-'+user.id).remove() for user in users
     
 socket.on "reset", (users) ->
   for user in users 
