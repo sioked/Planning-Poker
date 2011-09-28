@@ -51,9 +51,11 @@ socket.on "message", (msg) ->
   console.log "Got a message #{msg.message} from user #{msg.name}"
   
 socket.on "registered", (msg) ->
+  console.log "registered id: #{msg}"
   id = msg
 
 socket.on "register", (user) ->
+  console.log "register: #{user.name}"
   $('.people').append tpl.name({name: user.name, checked: false, id: user.id, vote: user.vote})
 
 socket.on "vote", (user) ->
