@@ -12,6 +12,12 @@ app = $.sammy "#main", () ->
       if not id
         register(name)
       context.app.swap tpl.cards()
+      $("a.card").bind "click", ->
+        $(".active").removeClass 'active'
+        $(@).addClass 'active'
+        val = $(this).data "vote"
+        vote(val)
+      
   @get "#!/login", (context) =>
     console.log "Login screen"
     context.app.swap tpl.login()
@@ -31,6 +37,7 @@ app = $.sammy "#main", () ->
     reset()
       
 $ ->
+  #Start the app!
   app.run "#!/"
 
 socket = io.connect()

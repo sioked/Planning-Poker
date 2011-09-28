@@ -1,7 +1,9 @@
+include mixins
 #allresults
   a(href="#!/reset") Reset
+  -results.sort(function(a,b){ return a.vote - b.vote});
   each r in results
     div.result
-      span.vote vote: #{r.vote} 
+      mixin card(r.vote)
       each user in r.users
-        span.name name: #{user.name}
+        span.name= user.name

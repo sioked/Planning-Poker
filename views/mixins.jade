@@ -1,0 +1,5 @@
+mixin card(vote)
+  -if (vote != 100)
+    a.card(data-vote=vote)= vote
+  -else
+    a.card(data-vote=vote) &#8734;

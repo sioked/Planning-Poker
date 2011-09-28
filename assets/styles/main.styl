@@ -51,9 +51,18 @@ var_card_height = var_card_width * 1.5
   float left
   border 1px black solid
   line-height var_card_height
-  margin-right 1em
-  margin-top 1em
+  margin .5em .5em 0 .5em
+  //margin-right 1em
+  //margin-top 1em
   font-size 3em
   text-decoration none
-    
+  clearfix()
+
+.result
+  width var_card_width*2
+  float left
+  clearfix()
+  .name
+    display block
+    text-align center
 @import 'mobile'

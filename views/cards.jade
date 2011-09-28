@@ -1,12 +1,7 @@
+include mixins
+
 h3 Place your vote...
 .cards
-  a.card(onclick="vote(1)") 1
-  a.card(onclick="vote(2)") 2
-  a.card(onclick="vote(3)") 3
-  a.card(onclick="vote(4)") 4
-  a.card(onclick="vote(5)") 5
-  a.card(onclick="vote(6)") 6
-  a.card(onclick="vote(8)") 8
-  a.card(onclick="vote(12)") 12
-  a.card(onclick="vote(16)") 16
-  a.card(onclick="vote(100)") &#8734;
+  -var cards = [1,2,3,4,5,6,8,12,16,100];
+  -each vote in cards
+    mixin card(vote)
