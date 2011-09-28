@@ -1,6 +1,6 @@
 include mixins
 #allresults
-  a(href="#!/reset") Reset
+  a.reset(href="#!/reset") Reset
   -results.sort(function(a,b){ return a.vote - b.vote});
   each r in results
     div.result
