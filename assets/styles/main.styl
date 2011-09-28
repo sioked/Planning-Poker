@@ -7,8 +7,7 @@ var_grid_gutter = 20px
 var_grid_width = 960px
 var_grid_debug = false
 var_font_size = (14px/1.4)
-//Color scheme:
-//http://www.colourlovers.com/palette/754405/Someone_Like_Me
+var_bg = #1e4164
 
 box-shadow(args...)
    -webkit-box-shadow args
@@ -27,7 +26,9 @@ body
   margin 0 auto 1em auto
 
 .header
-  background #1e4164
+  background var_bg
+  dark = var_bg - 25%
+  background linear-gradient(8px top, var_bg, dark) 
   color #fff
   box-shadow(0 1px 5px rgba(0,0,0,0.35))
   border-bottom solid 8px #8dc63f
