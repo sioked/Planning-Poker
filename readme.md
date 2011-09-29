@@ -11,6 +11,7 @@ planning tasks to include in a forthcoming sprint.
 * [Stylus
   Stylesheets](http://learnboost.github.com/stylus/docs/middleware.html)
 * [Socket.io](http://socket.io)
+# [Redis](http://redis.io)
 
 ##Setup & Run Project
 
