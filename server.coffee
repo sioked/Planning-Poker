@@ -2,8 +2,15 @@
 express = require 'express'
 app = module.exports = express.createServer()
 io = require('socket.io').listen app
-redis = require('redis')
-client = redis.createClient()
+if (process.env.REDISTOGO_URL) 
+  rtg   = require("url").parse(process.env.REDISTOGO_URL);
+  client = require("redis").createClient(rtg.port, rtg.hostname);
+  client.auth(rtg.auth.split(":")[1]);
+else
+  client = require("redis").createClient();
+
+#redis = require('redis')
+#client = redis.createClient()
 
 #Configuration
 app.set 'views', (__dirname + '/views')
@@ -14,7 +21,7 @@ app.use app.router
 app.use require('connect-assets')()
 app.use require('jade-client-connect')("#{__dirname}/views")
 app.use express.static(__dirname + '/public')
-  
+
 app.configure 'development', ->
   app.use express.errorHandler {dumpExceptions: true, showStack: true}
 
@@ -46,13 +53,14 @@ resetUsers = (callback) ->
   client.smembers "users", (err, users) ->
     index = 0
     for user in users 
-      client.hmset "#{user}", "name", name, "vote", 0, (err, result) ->
+      client.hmset "#{user}", "vote", 0, (err, result) ->
         index++
         if index == (users.length)
-          callback?(allUsers)   
+          callback?()   
           
 findUser = (id, callback) ->
   client.hgetall "user:#{id}", (err, result) ->
+    console.log "finduser: #{result}"
     callback(result)
   
 areUsersFinished = (users) ->
@@ -73,6 +81,7 @@ calculateResults = (users) ->
   return votes  
   
 io.sockets.on 'connection', (socket) ->
+  
   socket.on 'message', (msg) ->
     socket.get 'name', (err, name) ->
       if !err
@@ -81,23 +90,37 @@ io.sockets.on 'connection', (socket) ->
         socket.emit "alert", "You are not registered."
         
   socket.on 'join', (id) ->
-    findUsers (users) ->
-      findUser id, (user) ->
-        socket.emit "allUsers", users
-        socket.emit "registered", id
-        socket.broadcast.emit "register", user 
+    console.log "join: #{id}"
+    client.sadd "users", "user:#{id}", (err, result) ->
+      findUsers (users) ->
+        findUser id, (user) ->
+          if(user)
+            console.log "joining old user"
+            socket.emit "allUsers", users
+            socket.emit "joined", id
+            socket.broadcast.emit "newUser", user
+          else
+            client.incr "id", (err, id) ->
+              socket.set 'id', id, ->
+                user = {id: id, name: name, vote: 0}
+                client.sadd "users", "user:#{id}", (err, addResult) ->
+                  client.hmset "user:#{id}", "id", id, "name", name, "vote", 0, (err, result) ->
+                    console.log "All done, replying with a joined"
+                    socket.emit "allUsers", users
+                    socket.emit "joined", id
+                    socket.broadcast.emit "newUser", user
     
   socket.on 'register', (name) ->
     client.incr "id", (err, id) ->
       socket.set 'id', id, ->
         user = {id: id, name: name, vote: 0}
         client.sadd "users", "user:#{id}", (err, addResult) ->
-          client.hmset "user:#{id}", "name", name, "vote", 0, (err, result) ->
+          client.hmset "user:#{id}", "id", id, "name", name, "vote", 0, (err, result) ->
             findUsers (users) ->
               socket.emit "allUsers", users
               socket.emit "registered", id
               socket.broadcast.emit "register", user
-      
+     
   socket.on 'vote', (vote) ->
     socket.get 'id', (err, id) ->
       if !err   
@@ -117,14 +140,21 @@ io.sockets.on 'connection', (socket) ->
         socket.emit "alert", "You are not registered"
         
   socket.on 'reset', (reset) ->
-    resetUsers (users) ->
-      socket.broadcast.emit "reset", []
-      socket.emit "reset", []
+    console.log "resetting"
+    resetUsers () ->
+      console.log "callback resetting"
+      socket.broadcast.emit "reset"
+      socket.emit "reset",
     
   socket.on 'disconnect', -> 
     socket.get 'id', (err,id) ->
       findUser id, (user) ->
-        socket.broadcast.emit "remove", [user]
+        client.srem "users", "user:#{id}", (err, result) ->
+          socket.broadcast.emit "remove", [user]
     
 app.listen process.env.PORT || 3000
 console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env
+console.log "Flushing Redis Database"
+client.flushdb (err, result) ->
+  console.log "Redis flush err: #{err}" 
+  console.log "Redis flush result: #{result}"

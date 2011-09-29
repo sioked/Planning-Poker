@@ -11,5 +11,6 @@
       "connect-assets": "latest",
       "socket.io": "latest",
       "jade-client-connect": "latest"
+      "redis": "latest"
   }
 }
