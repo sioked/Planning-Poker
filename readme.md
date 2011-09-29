@@ -24,7 +24,9 @@ coffee server.coffee
 ```
 ##Heroku
 If you want to push this to Heroku, you will need to install redis there.
-* heroku addons:add redistogo
+```
+heroku addons:add redistogo
+```
 
 ##License
 This project is licensed under the MIT license. Please see the license for more details.
