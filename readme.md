@@ -22,7 +22,7 @@ npm install -g coffee-script
 npm install -d
 coffee server.coffee
 ```
-#Heroku
+##Heroku
 If you want to push this to Heroku, you will need to install redis there.
 * heroku addons:add redistogo
 
