@@ -10,6 +10,7 @@ app = $.sammy "#main", () ->
       app.setLocation "#!/login"
     else
       if not id
+        console.log "id: #{id}"
         register(name)
       context.app.swap tpl.cards()
       $("a.card").bind "click", ->
@@ -55,7 +56,6 @@ socket.on "registered", (msg) ->
   id = msg
 
 socket.on "register", (user) ->
-  console.log "register: #{user.name}"
   $('.people').append tpl.name({name: user.name, checked: false, id: user.id, vote: user.vote})
 
 socket.on "vote", (user) ->
@@ -65,6 +65,8 @@ socket.on "remove", (users) ->
   $('.name-'+user.id).remove() for user in users
     
 socket.on "reset", (users) ->
+  #don't need the users here
+  #just reset all users
   for user in users 
     $('.icon', $('.name-'+user.id)).removeClass('check')
   # need to remove the votes here.

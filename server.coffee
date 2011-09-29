@@ -3,6 +3,7 @@ express = require 'express'
 app = module.exports = express.createServer()
 io = require('socket.io').listen app
 redis = require('redis')
+client = redis.createClient()
 
 #Configuration
 app.set 'views', (__dirname + '/views')
@@ -13,10 +14,6 @@ app.use app.router
 app.use require('connect-assets')()
 app.use require('jade-client-connect')("#{__dirname}/views")
 app.use express.static(__dirname + '/public')
-
-#IDs
-client = redis.createClient()
-#client.set("id", 10)
   
 app.configure 'development', ->
   app.use express.errorHandler {dumpExceptions: true, showStack: true}
@@ -30,40 +27,41 @@ app.get '/', (req, res) ->
   
 app.get '/results', (req, res) ->
   res.contentType 'application/json'
-  res.send JSON.stringify(calculateResults())
+  findUsers (users) ->
+    res.send JSON.stringify calculateResults(users)
 
-#Collection of users
-#users = []
 findUsers = (callback) ->
   client.smembers "users", (err, users) ->
     allUsers = []
-    for user, index in users 
+    index = 0
+    for user in users 
       client.hgetall user, (err, u) ->
+        index++
         allUsers.push u
-        console.log "user in findusers: #{u}"
-        console.log "index: #{index}"
-        console.log "users size: #{users.length}"
         if index == (users.length)
-          console.log "allUsers in findusers: "
-          console.log allUsers
           callback?(allUsers)
   return null
-    
+   
+resetUsers = (callback) ->
+  client.smembers "users", (err, users) ->
+    index = 0
+    for user in users 
+      client.hmset "#{user}", "name", name, "vote", 0, (err, result) ->
+        index++
+        if index == (users.length)
+          callback?(allUsers)   
+          
 findUser = (id, callback) ->
   client.hgetall "user:#{id}", (err, result) ->
     callback(result)
   
-#probably should just pass in list of users
 areUsersFinished = (users) ->
-  if(users)
-    for user in users
-      if user.vote <= 0
-        return false
-    return true
-  else
-    return false
+  for user in users
+    if user.vote <= 0
+      return false
+  return true
 
-calculateResults = (users) ->
+calculateResults = (users) ->  
   votes = []
   for user in users when user.vote >0 
     vote = (v for v in votes when user.vote == v.vote)
@@ -82,6 +80,13 @@ io.sockets.on 'connection', (socket) ->
       else
         socket.emit "alert", "You are not registered."
         
+  socket.on 'join', (id) ->
+    findUsers (users) ->
+      findUser id, (user) ->
+        socket.emit "allUsers", users
+        socket.emit "registered", id
+        socket.broadcast.emit "register", user 
+    
   socket.on 'register', (name) ->
     client.incr "id", (err, id) ->
       socket.set 'id', id, ->
@@ -89,44 +94,37 @@ io.sockets.on 'connection', (socket) ->
         client.sadd "users", "user:#{id}", (err, addResult) ->
           client.hmset "user:#{id}", "name", name, "vote", 0, (err, result) ->
             findUsers (users) ->
-              console.log users
               socket.emit "allUsers", users
-              console.log "id: #{id}"
               socket.emit "registered", id
-              console.log("user: #{user}")
               socket.broadcast.emit "register", user
       
   socket.on 'vote', (vote) ->
     socket.get 'id', (err, id) ->
-      if !err
-        allUsers = []
+      if !err   
         client.hmset "user:#{id}", "vote", vote, (err, result) ->
-          user = findUser id, (user) ->
+          findUser id, (user) ->
             if user
               socket.broadcast.emit "vote", user
               socket.emit "vote", user
               findUsers (users) ->
                 console.log "all users: #{users}"
-                console.log "user: #{user}" for user in users
+                console.log "user: #{user.name}" for user in users
                 if(areUsersFinished(users))
-                  results = calculateResults(users)
-                  socket.emit "results", results
-                  socket.broadcast.emit "results", results
+                  console.log "users are finished"
+                  socket.emit "results"
+                  socket.broadcast.emit "results"
       else
         socket.emit "alert", "You are not registered"
         
   socket.on 'reset', (reset) ->
-    user.vote = 0 for user in users
-    socket.broadcast.emit "reset", users
-    socket.emit "reset", users
+    resetUsers (users) ->
+      socket.broadcast.emit "reset", []
+      socket.emit "reset", []
     
-  #need to rethink this for redis
   socket.on 'disconnect', -> 
     socket.get 'id', (err,id) ->
-      findUsers (users) ->
-        removals = (user for user in users when user.id == id)
-        users = (user for user in users when user.id != id)
-        socket.broadcast.emit "remove", removals
+      findUser id, (user) ->
+        socket.broadcast.emit "remove", [user]
     
 app.listen process.env.PORT || 3000
 console.log "Server listening on port %d in %s mode", app.address().port, app.settings.env
