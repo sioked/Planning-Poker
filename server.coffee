@@ -14,7 +14,8 @@ app.use require('jade-client-connect')("#{__dirname}/views")
 app.use express.static(__dirname + '/public')
 
 #Collection of users
-users =[]
+registered = []
+users      = []
 
 app.configure 'development', ->
   app.use express.errorHandler {dumpExceptions: true, showStack: true}
@@ -40,6 +41,7 @@ findUser = (id) ->
   return null
   
 areUsersFinished = () ->
+  console.log users
   for user in users
     if user.vote <= 0
       return false
@@ -56,7 +58,10 @@ calculateResults = () ->
       votes.push {vote: user.vote, count: 1, users: [user]}
   return votes  
   
+clients = []
+sockets = []
 io.sockets.on 'connection', (socket) ->
+  
   socket.on 'message', (msg) ->
     socket.get 'name', (err, name) ->
       if !err
@@ -65,13 +70,49 @@ io.sockets.on 'connection', (socket) ->
         socket.emit "alert", "You are not registered."
         
   socket.on 'register', (name) ->
-    id=ids.pop()
+    id = (user.id for user in registered when user.name is name)[0]
+    console.log "Got an id #{id}"
+    if not id
+      id=ids.pop()
+      console.log socket
+      registered.push 
+        id    : id
+        name  : name
+        socket: socket.id
+      sockets.push
+        id    : socket.id
+        socket: socket
+    console.log registered
     socket.set 'id', id, ->
-      user = {id: id, name: name, vote: 0}
-      users.push user
-      socket.emit "allUsers", users
+      console.log "id: #{id}"
       socket.emit "registered", id
-      socket.broadcast.emit "register", user
+      
+  socket.on 'join', (id) ->
+    id = id * 1
+    console.log "got a join"
+    console.log users
+    if (user for user in users when user.id is id)[0]
+      console.log "Already in here!"
+      old_socket = (ruser.socket for ruser in registered when user.id is id)[0]
+      #console.log sockets[old_socket]
+      #socket.manager.onClientDisconnect( old_socket ) #Kick out any old sockets
+      socket.set 'id', id, ->
+        socket.emit "joined", id
+        socket.emit "allUsers", users
+        socket.broadcast.emit "newUser", user
+    else
+      console.log registered
+      console.log "Id search is #{id}"
+      name = (user.name for user in registered when user.id is id)[0]
+      console.log name
+      users.push
+        id    : id
+        name  : name
+        vote  : 0
+      socket.emit "allUsers", users
+      console.log "All done, replying with a joined"
+      socket.emit "joined", id
+      socket.broadcast.emit "newUser", user
       
   socket.on 'vote', (vote) ->
     socket.get 'id', (err, id) ->
